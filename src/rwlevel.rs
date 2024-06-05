@@ -1,12 +1,15 @@
 use std::path::PathBuf;
 
+use crate::tile::Tile;
+
 pub struct RWLevel {
     name: Option<String>,
+    meta: RWLevelMeta,
+    tiles: [Tile; 3],
+}
+
+pub struct RWLevelMeta {
     dimensions: (u16, u16),
-    geometry: [Geometry; 3],
-    tiles: [RWProp; 3],
-    items: RWItem,
-    effects: ()
 }
 
 impl RWLevel {
@@ -14,7 +17,3 @@ impl RWLevel {
         None
     }
 }
-
-struct Geometry;
-struct RWProp;
-struct RWItem;
