@@ -1,5 +1,5 @@
 
-use std::borrow::{Borrow, Cow};
+use std::borrow::Cow;
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -10,7 +10,7 @@ static INITIAL_REPLACEMENT: Lazy<Regex> = Lazy::new(|| {
 });
 
 static DATA_NAME_REPLACEMENT: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"((color|point|rect)\([0-9, ]+\))"#)
+    Regex::new(r#"((color|point|rect)\([0-9, \-]+\))"#)
         .expect("Failed to compile data type regex")
 });
 
@@ -33,25 +33,20 @@ fn jsonify_lingo_objects(input: &str) -> String {
         let c = chars[idx];
 
         match c {
-            //The start of a key
-            '#' => {
-                //Find the beginning of the value
+            //The start of a value
+            '[' => {
                 let mut idx2 = idx;
-                while chars[idx2] != ' ' {
+    
+                while chars[idx2] == '[' {
                     idx2 += 1;
                 }
-    
-                //Currently on the space char between the key and the value.
-                //Skip to the first char of the value
-                idx2 += 1;
-                //If the value is not a nested object, or it doesn't use `[`,
-                //this key doesn't require further processing, and can be skipped
-                if chars[idx2] != '[' || chars[idx2 + 1] != '#' {
+
+                if chars[idx2] != '#' {
                     continue 'outer;
                 }
 
                 //Replace the `[`.
-                chars[idx2] = '{';
+                chars[idx2 - 1] = '{';
 
                 //Depth tracks how many `[` and `]`s have been encountered.
                 //Need to iterate through the chars from idx2 to the end until depth
