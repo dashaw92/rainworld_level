@@ -1,6 +1,6 @@
 mod regex_convert;
 
-use std::{fs::read_to_string, path::{Path, PathBuf}};
+use std::{fs::read_to_string, path::Path};
 
 use crate::tile::Tile;
 
@@ -31,7 +31,7 @@ impl RWLevel {
 
 
     pub fn load<P: AsRef<Path>>(path: P) -> Option<Self> {
-        let lines: Vec<_> = read_to_string(&path).ok()?
+        let _lines: Vec<_> = read_to_string(&path).ok()?
             .split("\n")
             .collect();
 
