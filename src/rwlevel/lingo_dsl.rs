@@ -1,24 +1,24 @@
 use std::str::FromStr;
 
 #[derive(Debug)]
-pub(in crate::rwlevel) struct Point {
-    fst: isize,
-    snd: isize,
+pub(crate) struct Point {
+    pub(crate) fst: isize,
+    pub(crate) snd: isize,
 }
 
 #[derive(Debug)]
-pub(in crate::rwlevel) struct Color {
-    red: u8,
-    green: u8,
-    blue: u8,
+pub(crate) struct Color {
+    pub(crate) red: u8,
+    pub(crate) green: u8,
+    pub(crate) blue: u8,
 }
 
 #[derive(Debug)]
-pub(in crate::rwlevel) struct Rect {
-    top: isize,
-    left: isize,
-    bottom: isize,
-    right: isize,
+pub(crate) struct Rect {
+    pub(crate) top: isize,
+    pub(crate) left: isize,
+    pub(crate) bottom: isize,
+    pub(crate) right: isize,
 }
 
 fn collect<T: FromStr>(prefix: &str, s: &str, expected_len: usize) -> Option<Vec<T>> {

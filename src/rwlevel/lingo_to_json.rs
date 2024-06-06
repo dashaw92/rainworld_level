@@ -4,16 +4,16 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use serde_json::Value;
 
-pub(super) struct ProjectJson {
-    _geom: Value,
-    _tiles: Value,
-    _effects: Value,
-    _lights: Value,
-    _settings1: Value,
-    _settings2: Value,
-    _cams: Value,
-    _water: Value,
-    _props: Value,
+pub(crate) struct ProjectJson {
+    pub(crate) _geom: Value,
+    pub(crate) _tiles: Value,
+    pub(crate) _effects: Value,
+    pub(crate) _lights: Value,
+    pub(crate) _settings1: Value,
+    pub(crate) _settings2: Value,
+    pub(crate) _cams: Value,
+    pub(crate) _water: Value,
+    pub(crate) _props: Value,
 }
 
 pub(super) fn read_to_struct<P: AsRef<Path>>(file: P) -> Option<ProjectJson> {
@@ -212,7 +212,18 @@ mod tests {
 [#props: [], #lastKeys: [], #Keys: [], #workLayer: 1, #lstMsPs: point(0, 0), #pmPos: point(1, 1), #pmSavPosL: [], #propRotation: 0, #propStretchX: 1, #propStretchY: 1, #propFlipX: 1, #propFlipY: 1, #depth: 0, #color: 0]"##;
 
         let json = convert_lines(lines, '\n').unwrap();
-        let _size: Point = dbg!(json._settings2.get("#size").and_then(Value::as_str).unwrap().parse().unwrap());
-        let _light: Rect = dbg!(json._settings1.get("#lightRect").and_then(Value::as_str).unwrap().parse().unwrap());
+        let _size: Point = dbg!(
+            dbg!(json._settings2.get("#size"))
+                .and_then(Value::as_str)
+                .and_then(|val| val.parse().ok())
+                .unwrap()
+        );
+
+        let _light: Rect = dbg!(
+            dbg!(json._settings1.get("#lightRect"))
+                .and_then(Value::as_str)
+                .and_then(|val| val.parse().ok())
+                .unwrap()
+        );
     }
 }

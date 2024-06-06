@@ -1,4 +1,5 @@
 #[allow(unused)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Geometry {
     /// Passable tile
     Air = 0,
@@ -19,6 +20,7 @@ pub enum Geometry {
 }
 
 #[allow(unused)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Feature {
     /// Horizontal pole that can be climbed on
     HPole = 1,
@@ -55,7 +57,44 @@ pub enum Feature {
 }
 
 #[allow(unused)]
+#[derive(Clone, Debug)]
 pub struct Tile {
-    geometry: Geometry,
+    pub geometry: Geometry,
     features: Vec<Feature>,
+}
+
+impl Default for Tile {
+    fn default() -> Self {
+        Self {
+            geometry: Geometry::Wall,
+            features: vec![],
+        }
+    }
+}
+
+impl Tile {
+    pub fn add_features(&mut self, features: &[Feature]) {
+        for feature in features {
+            if !self.features.contains(&feature) {
+                self.features.push(*feature);
+            }
+        }
+    }
+
+    pub fn remove_features(&mut self, features: &[Feature]) {
+        self.features.retain(|f| !features.contains(f));
+    }
+
+    pub fn features(&self) -> &[Feature] {
+        &self.features
+    }
+}
+
+impl Geometry {
+    pub fn to_tile(&self) -> Tile {
+        Tile {
+            geometry: *self,
+            features: vec![],
+        }
+    }
 }

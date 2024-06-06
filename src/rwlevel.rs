@@ -3,7 +3,9 @@ mod lingo_dsl;
 
 use std::path::Path;
 
+use lingo_dsl::Point;
 use lingo_to_json::read_to_struct;
+use serde_json::Value;
 
 use crate::tile::Tile;
 
@@ -22,7 +24,7 @@ pub struct RWLevel {
 #[allow(unused)]
 pub struct RWLevelMeta {
     /// (Width, Height) dimensions of the level
-    dimensions: (isize, isize),
+    dimensions: (usize, usize),
 }
 
 impl RWLevel {
@@ -42,10 +44,21 @@ impl RWLevel {
             .to_path_buf()
             .file_stem()
             .and_then(|ostr| ostr.to_owned().into_string().ok())?;
+
+        let size: Point = _json._settings2.get("#size")
+                .and_then(Value::as_str)
+                .and_then(|val| val.parse().ok())
+                .unwrap();
+
         let meta = RWLevelMeta {
-            dimensions: (0, 0)
+            dimensions: (size.fst as usize, size.snd as usize)
         };
-        let tiles = [vec![], vec![], vec![]];
+        let dim = meta.dimensions.0 * meta.dimensions.1;
+        let tiles = [
+            vec![Tile::default(); dim],
+            vec![Tile::default(); dim],
+            vec![Tile::default(); dim],
+        ];
 
         Some(Self {
             name,
