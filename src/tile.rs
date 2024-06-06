@@ -1,3 +1,4 @@
+#[allow(unused)]
 pub enum Geometry {
     /// Passable tile
     Air = 0,
@@ -17,6 +18,7 @@ pub enum Geometry {
     Glass = 9,
 }
 
+#[allow(unused)]
 pub enum Feature {
     /// Horizontal pole that can be climbed on
     HPole = 1,
@@ -52,6 +54,7 @@ pub enum Feature {
     ScavengerHole = 21,
 }
 
+#[allow(unused)]
 pub struct Tile {
     geometry: Geometry,
     features: Vec<Feature>,
