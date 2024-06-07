@@ -1,4 +1,4 @@
-mod rwlevel;
+pub mod rwlevel;
 mod tile;
 
 pub use rwlevel::RWLevel;

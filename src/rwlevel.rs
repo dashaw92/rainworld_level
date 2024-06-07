@@ -1,4 +1,4 @@
-mod lingo_to_json;
+pub mod lingo_to_json;
 mod lingo_dsl;
 
 use std::{array, path::Path};
@@ -10,6 +10,7 @@ use serde_json::Value;
 use crate::tile::{Feature, Geometry, Tile};
 
 #[allow(unused)]
+#[derive(Debug)]
 pub struct RWLevel {
     /// Based off the filename provided to RWLevel::load
     name: String,
@@ -22,6 +23,7 @@ pub struct RWLevel {
 }
 
 #[allow(unused)]
+#[derive(Debug)]
 pub struct RWLevelMeta {
     /// (Width, Height) dimensions of the level
     dimensions: (usize, usize),
@@ -35,7 +37,6 @@ impl RWLevel {
     pub const L2_MG: usize = 1;
     /// Helper constant for indexing into the layer 3 (background) of tiles
     pub const L3_BG: usize = 2;
-
 
     pub fn load<P: AsRef<Path>>(path: P) -> Option<Self> {
         let json = read_to_struct(&path)?;
@@ -64,7 +65,7 @@ impl RWLevel {
     }
 }
 
-pub fn load_tiles(json: &ProjectJson, meta: &RWLevelMeta) -> [Vec<Tile>; 3] {
+fn load_tiles(json: &ProjectJson, meta: &RWLevelMeta) -> [Vec<Tile>; 3] {
     let dim = meta.dimensions.0 * meta.dimensions.1;
     let w = meta.dimensions.0;
     let mut tiles = array::from_fn(|_| vec![Tile::default(); dim]);
@@ -89,7 +90,7 @@ pub fn load_tiles(json: &ProjectJson, meta: &RWLevelMeta) -> [Vec<Tile>; 3] {
                     .filter_map(Feature::from_data)
                     .collect();
 
-                tiles[layer][y + w * x] = Tile {
+                tiles[layer][y * w + x] = Tile {
                     geometry,
                     features,
                 };

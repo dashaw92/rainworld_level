@@ -4,6 +4,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use serde_json::Value;
 
+#[derive(Debug)]
 pub(crate) struct ProjectJson {
     pub(crate) _geom: Value,
     pub(crate) _tiles: Value,

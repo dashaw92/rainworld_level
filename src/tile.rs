@@ -16,6 +16,8 @@ pub enum Geometry {
     SlopeNE = 5,
     /// Solid, but can be dropped through
     Floor = 6,
+    /// Shortcut entrance?
+    ShortcutEntrance = 7,
     /// Invisible wall
     Glass = 9,
 }
@@ -109,6 +111,7 @@ impl Geometry {
             4 => Self::SlopeNW,
             5 => Self::SlopeNE,
             6 => Self::Floor,
+            7 => Self::ShortcutEntrance,
             9 => Self::Glass,
             _ => return None,
         })
