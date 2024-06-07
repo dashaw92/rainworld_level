@@ -1,4 +1,5 @@
 #[allow(unused)]
+#[repr(u8)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Geometry {
     /// Passable tile
@@ -10,9 +11,9 @@ pub enum Geometry {
     /// Slope with the southeast half solid
     SlopeSE = 3,
     /// Slope with the northeast half solid
-    SlopeNE = 4,
+    SlopeNW = 4,
     /// Slope with the northwest half solid
-    SlopeNW = 5,
+    SlopeNE = 5,
     /// Solid, but can be dropped through
     Floor = 6,
     /// Invisible wall
@@ -20,6 +21,7 @@ pub enum Geometry {
 }
 
 #[allow(unused)]
+#[repr(u8)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Feature {
     /// Horizontal pole that can be climbed on
@@ -60,7 +62,7 @@ pub enum Feature {
 #[derive(Clone, Debug)]
 pub struct Tile {
     pub geometry: Geometry,
-    features: Vec<Feature>,
+    pub features: Vec<Feature>,
 }
 
 impl Default for Tile {
@@ -96,5 +98,43 @@ impl Geometry {
             geometry: *self,
             features: vec![],
         }
+    }
+
+    pub fn from_data(data: u8) -> Option<Self> {
+        Some(match data {
+            0 => Self::Air,
+            1 => Self::Wall,
+            2 => Self::SlopeSW,
+            3 => Self::SlopeSE,
+            4 => Self::SlopeNW,
+            5 => Self::SlopeNE,
+            6 => Self::Floor,
+            9 => Self::Glass,
+            _ => return None,
+        })
+    }
+}
+
+impl Feature {
+    pub fn from_data(data: u8) -> Option<Self> {
+        Some(match data {
+            1 => Self::HPole,
+            2 => Self::VPole,
+            3 => Self::Hive,
+            4 => Self::ShortcutEntrance,
+            5 => Self::ShortcutPathDot,
+            6 => Self::RoomEntrance,
+            7 => Self::CreatureDen,
+            9 => Self::Rock,
+            10 => Self::Spear,
+            11 => Self::Fissure,
+            12 => Self::ForbidBatflyChain,
+            13 => Self::GarbageWormDen,
+            18 => Self::Waterfall,
+            19 => Self::GopherHole,
+            20 => Self::WormGrass,
+            21 => Self::ScavengerHole,
+            _ => return None,
+        })
     }
 }

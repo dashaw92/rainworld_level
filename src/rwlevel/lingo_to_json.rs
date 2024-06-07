@@ -186,7 +186,7 @@ fn convert_to_json(input: &str) -> Cow<'_, str> {
 mod tests {
     use serde_json::Value;
 
-    use crate::rwlevel::{lingo_dsl::{Point, Rect}, lingo_to_json::convert_to_json};
+    use crate::rwlevel::{lingo_dsl::Point, lingo_to_json::convert_to_json, load_tiles, RWLevelMeta};
 
     use super::convert_lines;
 
@@ -201,7 +201,7 @@ mod tests {
 
     #[test]
     fn test_full_convert() {
-        let lines = r##"[[[[4, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[1, []], [0, []], [0, []]]], [[[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, [10, 2]], [0, []], [0, []]]], [[[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]]], [[[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]]], [[[5, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[9, []], [0, []], [0, []]]]]
+        let lines = r##"[[[[4, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[2, []], [0, []], [0, []]]], [[[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]]], [[[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]]], [[[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]]], [[[5, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[0, []], [0, []], [0, []]], [[3, []], [0, []], [0, []]]]]
 [#lastKeys: [#L: 0, #m1: 0, #m2: 0, #w: 0, #a: 0, #s: 0, #d: 0, #c: 0, #q: 0], #Keys: [#L: 0, #m1: 0, #m2: 0, #w: 0, #a: 0, #s: 0, #d: 0, #c: 0, #q: 0], #workLayer: 1, #lstMsPs: point(8, -1), #tlMatrix: [[[[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]]], [[[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]]], [[[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]]], [[[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]]], [[[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]], [[#tp: "default", #Data: 0], [#tp: "default", #Data: 0], [#tp: "default", #Data: 0]]]], #defaultMaterial: "Concrete", #toolType: "tile", #toolData: "TILE", #tmPos: point(2, 1), #tmSavPosL: [1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 28], #specialEdit: 0]
 [#lastKeys: [], #Keys: [], #lstMsPs: point(0, 0), #effects: [], #emPos: point(1, 1), #editEffect: 0, #selectEditEffect: 0, #mode: "createNew", #brushSize: 5]
 [#pos: point(567, 695), #rot: 0, #sz: point(50, 70), #col: 1, #Keys: [#m1: 0, #m2: 0, #w: 0, #a: 0, #s: 0, #d: 0, #r: 0, #f: 0, #z: 0, #m: 0], #lastKeys: [#m1: 0, #m2: 0, #w: 0, #a: 0, #s: 0, #d: 0, #r: 0, #f: 0, #z: 0, #m: 0], #lastTm: 301443808, #lightAngle: 180, #flatness: 1, #lightRect: rect(1000, 1000, -1000, -1000), #paintShape: "pxl"]
@@ -219,11 +219,11 @@ mod tests {
                 .unwrap()
         );
 
-        let _light: Rect = dbg!(
-            dbg!(json._settings1.get("#lightRect"))
-                .and_then(Value::as_str)
-                .and_then(|val| val.parse().ok())
-                .unwrap()
-        );
+        let meta = RWLevelMeta {
+            dimensions: (_size.fst as usize, _size.snd as usize)
+        };
+
+        let _tiles = load_tiles(&json, &meta);
+        dbg!(&_tiles[0]);
     }
 }
