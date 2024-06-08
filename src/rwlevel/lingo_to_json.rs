@@ -23,14 +23,19 @@ pub(super) fn read_to_struct<P: AsRef<Path>>(file: P) -> Option<ProjectJson> {
 }
 
 fn convert_lines(contents: &str, newline: char) -> Option<ProjectJson> {
-    let Ok(maps): Result<[Value; 9], _> = contents.split(newline)
-        .map(convert_to_json)
-        .filter_map(|line| serde_json::from_str(&line).ok())
-        .collect::<Vec<_>>()
-        .try_into() 
-    else {
-        eprintln!("Invalid level editor project file!");
-        return None;
+
+    let maps: [Value; 9] = {
+        let mut iter = contents.split(newline)
+            .map(convert_to_json)
+            .filter_map(|line| serde_json::from_str(&line).ok());
+        
+        let mut maps: [Option<Value>; 9] = std::array::from_fn(|_| iter.next());
+        if maps.iter().any(Option::is_none) {
+            eprintln!("Invalid level editor project file!");
+            return None;
+        }
+
+        std::array::from_fn(|i| maps[i].take().unwrap())
     };
 
     let [ 
