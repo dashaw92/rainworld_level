@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::VecDeque, fs::read_to_string, path::Path};
+use std::{borrow::Cow, fs::read_to_string, path::Path};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -23,25 +23,21 @@ pub(super) fn read_to_struct<P: AsRef<Path>>(file: P) -> Option<ProjectJson> {
 }
 
 fn convert_lines(contents: &str, newline: char) -> Option<ProjectJson> {
-    let mut maps: VecDeque<Value> = contents.split(newline)
+    let Ok(maps): Result<[Value; 9], _> = contents.split(newline)
         .map(convert_to_json)
         .filter_map(|line| serde_json::from_str(&line).ok())
-        .collect();
-
-    if maps.len() != 9 {
+        .collect::<Vec<_>>()
+        .try_into() 
+    else {
         eprintln!("Invalid level editor project file!");
         return None;
-    }
+    };
 
-    let _geom = maps.pop_front()?;
-    let _tiles = maps.pop_front()?;
-    let _effects = maps.pop_front()?;
-    let _lights = maps.pop_front()?;
-    let _settings1 = maps.pop_front()?;
-    let _settings2 = maps.pop_front()?;
-    let _cams = maps.pop_front()?;
-    let _water = maps.pop_front()?;
-    let _props = maps.pop_front()?;
+    let [ 
+        _geom, _tiles, _effects, 
+        _lights, _settings1, _settings2, 
+        _cams, _water, _props 
+    ] = maps;
 
     Some(ProjectJson {
         _geom,
