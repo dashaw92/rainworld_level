@@ -2,7 +2,7 @@ use std::{borrow::Cow, collections::VecDeque, fs::read_to_string, path::Path};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
-use serde_json::Value;
+use serde_json::{value::Index, Value};
 
 #[derive(Debug)]
 pub(crate) struct ProjectJson {
@@ -181,13 +181,26 @@ fn convert_to_json(input: &str) -> Cow<'_, str> {
     return Cow::Owned(wrap_in_braces(&work))
 }
 
+pub(crate) trait BetterIndexing {
+    type Output;
 
+    fn index(&self, path: &[&dyn Index]) -> Option<&Self::Output>;
+}
+
+impl BetterIndexing for Value {
+    type Output = Value;
+    fn index(&self, path: &[&dyn Index]) -> Option<&Self::Output> {
+        if path.is_empty() {
+            return Some(self)
+        }
+
+        self.get(path[0])?.index(&path[1..])
+    }
+}
 
 #[cfg(test)]
 mod tests {
-    use serde_json::Value;
-
-    use crate::rwlevel::{lingo_dsl::Point, lingo_to_json::convert_to_json, load_tiles, RWLevelMeta};
+    use crate::rwlevel::lingo_to_json::{convert_to_json, BetterIndexing};
 
     use super::convert_lines;
 
@@ -213,18 +226,20 @@ mod tests {
 [#props: [], #lastKeys: [], #Keys: [], #workLayer: 1, #lstMsPs: point(0, 0), #pmPos: point(1, 1), #pmSavPosL: [], #propRotation: 0, #propStretchX: 1, #propStretchY: 1, #propFlipX: 1, #propFlipY: 1, #depth: 0, #color: 0]"##;
 
         let json = convert_lines(lines, '\n').unwrap();
-        let _size: Point = dbg!(
-            dbg!(json._settings2.get("#size"))
-                .and_then(Value::as_str)
-                .and_then(|val| val.parse().ok())
-                .unwrap()
-        );
+        // let _size: Point = dbg!(
+        //     dbg!(json._settings2.get("#size"))
+        //         .and_then(Value::as_str)
+        //         .and_then(|val| val.parse().ok())
+        //         .unwrap()
+        // );
 
-        let meta = RWLevelMeta {
-            dimensions: (_size.fst as usize, _size.snd as usize)
-        };
+        // let meta = RWLevelMeta {
+        //     dimensions: (_size.fst as usize, _size.snd as usize)
+        // };
 
-        let _tiles = load_tiles(&json, &meta);
-        dbg!(&_tiles[0]);
+        // let _tiles = load_tiles(&json, &meta);
+        // dbg!(&_tiles[0]);
+
+        dbg!(json._geom.index(&[&0, &1, &1, &1]).unwrap());
     }
 }

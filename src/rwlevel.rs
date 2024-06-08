@@ -4,7 +4,7 @@ mod lingo_dsl;
 use std::{array, path::Path};
 
 use lingo_dsl::Point;
-use lingo_to_json::{read_to_struct, ProjectJson};
+use lingo_to_json::{read_to_struct, BetterIndexing, ProjectJson};
 use serde_json::Value;
 
 use crate::tile::{Feature, Geometry, Tile};
@@ -73,10 +73,9 @@ fn load_tiles(json: &ProjectJson, meta: &RWLevelMeta) -> [Vec<Tile>; 3] {
     for x in 0..meta.dimensions.0 {
         for y in 0..meta.dimensions.1 {
             for layer in 0..3 {
-                let tile = json._geom.get(x)
-                    .and_then(|v| v.get(y))
-                    .and_then(|v| v.get(layer))
-                    .and_then(|v| v.as_array()).expect("Bad tile entry in level");
+                let tile = json._geom.index(&[&x, &y, &layer])
+                    .and_then(|v| v.as_array())
+                    .expect("Bad tile entry in level");
 
                 let _geom_json = tile.get(0).and_then(|v| v.as_u64()).expect("Bad geometry entry in level") as u8;
 
