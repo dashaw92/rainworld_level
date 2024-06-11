@@ -7,7 +7,7 @@ use lingo_dsl::Point;
 use lingo_to_json::{read_to_struct, BetterIndexing, ProjectJson};
 use serde_json::Value;
 
-use crate::tile::{Feature, Geometry, Tile};
+use crate::{effect::Effect, tile::{Feature, Geometry, Tile}};
 
 #[allow(unused)]
 #[derive(Debug)]
@@ -20,6 +20,7 @@ pub struct RWLevel {
     /// Each index represents a layer of the level, starting with the foreground at index 0.
     /// Inner vectors are 2D arrays projected into 1D, progressing from Y = 0 to height for each X index
     tiles: [Vec<Tile>; 3],
+    effects: Vec<Effect>,
 }
 
 #[allow(unused)]
@@ -30,7 +31,6 @@ pub struct RWLevelMeta {
 }
 
 impl RWLevel {
-
     /// Helper constant for indexing into the layer 1 (foreground) of tiles
     pub const L1_FG: usize = 0;
     /// Helper constant for indexing into the layer 2 (midground) of tiles
@@ -56,11 +56,13 @@ impl RWLevel {
         };
         
         let tiles = load_tiles(&json, &meta);
+        let effects = load_effects(&json);
 
         Some(Self {
             name,
             meta,
             tiles,
+            effects,
         })
     }
 }
@@ -98,4 +100,43 @@ fn load_tiles(json: &ProjectJson, meta: &RWLevelMeta) -> [Vec<Tile>; 3] {
     }
 
     tiles
+}
+
+fn load_effects(json: &ProjectJson) -> Vec<Effect> {
+    let mut effects = Vec::new();
+    let Some(arr) = json._effects.get("#effects")
+        .and_then(|v| v.as_array())
+    else {
+        return effects;
+    };
+
+    for entry in arr {
+        let name = entry.get("#nm")
+            .and_then(|v| v.as_str())
+            .expect("Missing effect name #nm")
+            .to_owned();
+        let mtrx = entry.get("#mtrx")
+            .and_then(|v| v.as_array())
+            .expect("Missing #mtrx");
+        let opts = entry.get("#Options")
+            .expect("Missing #Options");
+
+        let matrix = mtrx.iter()
+            .map(|v_arr| {
+                let pctgs = v_arr.as_array().expect("Array is bad!");
+
+                pctgs.iter()
+                    .filter_map(|entry| entry.as_f64())
+                    .collect()
+            })
+            .collect();
+
+        effects.push(Effect {
+            name,
+            matrix,
+            options: opts.clone(),
+        });
+    }
+
+    effects
 }
